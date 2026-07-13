@@ -25,3 +25,6 @@ PAPER_WALLET_FILE=os.path.join(DATA_DIR,'paper_wallet.json')
 CONFIG_FILE=os.path.join(DATA_DIR,'config.json')
 API_KEY = os.getenv("INDODAX_API_KEY", "")
 SECRET_KEY = os.getenv("INDODAX_SECRET_KEY", "")
+API_KEY = INDODAX_API_KEY
+API_SECRET = INDODAX_SECRET_KEY
+SECRET_KEY = INDODAX_SECRET_KEY
