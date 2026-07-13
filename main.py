@@ -83,7 +83,7 @@ def engine_worker():
     info("Engine startup")
     if not exchange.health_check():
         error("Exchange offline")
-        return
+
     trader.startup()
     scheduler.start()
 
