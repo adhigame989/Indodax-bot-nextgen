@@ -1,0 +1,19 @@
+# Web Framework
+Flask>=3.0.0
+gunicorn>=23.0.0
+
+# Exchange API
+ccxt>=4.4.0
+
+# Data Processing
+pandas>=2.2.0
+numpy>=1.26.0
+
+# HTTP
+requests>=2.32.0
+
+# Environment
+python-dotenv>=1.0.1
+
+# Utilities
+pytz>=2024.1
