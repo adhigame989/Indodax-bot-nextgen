@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Monitor{% endblock %}
+{% block content %}
+<h2>📈 Live Monitor</h2>
+
+<div class="grid">
+<div class="card"><h3>Bot</h3><p id="bot">-</p></div>
+<div class="card"><h3>Exchange</h3><p id="exchange">-</p></div>
+<div class="card"><h3>Coin</h3><p id="coin-count">0</p></div>
+<div class="card"><h3>Layer</h3><p id="layer-count">0</p></div>
+<div class="card"><h3>Floating</h3><p id="floating">0%</p></div>
+<div class="card"><h3>Hari Ini</h3><p id="today">0%</p></div>
+</div>
+
+<h3 style="margin-top:20px">Active Position</h3>
+<div id="positions"></div>
+
+<h3 style="margin-top:20px">Aktivitas Terakhir</h3>
+<div id="activity" class="card">Belum ada aktivitas.</div>
+
+<script>
+function badge(v){
+ if(v>0)return '<span style="color:#22c55e">🟢 PROFIT</span>';
+ if(v<0)return '<span style="color:#ef4444">🔴 LOSS</span>';
+ return '<span style="color:#facc15">🟡 HOLD</span>';
+}
+async function refreshMonitor(){
+ const status=await apiSafe(()=>API.status(),null);
+ const stats=await apiSafe(()=>API.stats(),null);
+ const pos=await apiSafe(()=>API.positions(),{});
+ const hist=await apiSafe(()=>API.history(),[]);
+ if(status){
+  bot.innerText=status.bot;
+  exchange.innerText=status.exchange;
+  document.getElementById("coin-count").innerText=status.symbols;
+  document.getElementById("layer-count").innerText=status.layers;
+ }
+ if(stats){
+  floating.innerText=(stats.net_profit_percent??0)+"%";
+  today.innerText=(stats.net_profit_percent??0)+"%";
+ }
+ const c=document.getElementById("positions");
+ c.innerHTML="";
+ const syms=Object.keys(pos);
+ if(!syms.length){
+   c.innerHTML='<div class="card"><h3>Tidak ada posisi aktif</h3><p>Menunggu sinyal BUY.</p></div>';
+ }else{
+ syms.forEach(s=>{
+   let h='<div class="card"><h3>'+s+'</h3>';
+   pos[s].forEach(l=>{
+    h+=`
+    <div style="border-top:1px solid #374151;margin-top:10px;padding-top:10px">
+    <b>Layer:</b> ${l.layer_id}<br>
+    <b>Buy:</b> ${l.buy_price}<br>
+    <b>Current:</b> ${l.last_price??'-'}<br>
+    <b>Profit:</b> ${l.profit_percent??0}% ${badge(l.profit_percent??0)}<br>
+    <b>Highest:</b> ${l.highest_profit??0}%<br>
+    <b>TP:</b> ${l.take_profit??'-'}% &nbsp;
+    <b>SL:</b> ${l.stop_loss??'-'}%<br>
+    <b>Trailing:</b> ${l.trailing_enabled?'ON':'OFF'}<br>
+    <b>Hold:</b> ${l.buy_time??'-'}
+    </div>`;
+   });
+   h+='</div>';
+   c.innerHTML+=h;
+ });
+ }
+ const a=document.getElementById("activity");
+ if(hist.length){
+   let out="";
+   hist.slice(-5).reverse().forEach(x=>{
+     out+=`<div>${x.timestamp??''} - ${x.side} ${x.symbol} (${x.reason??''})</div>`;
+   });
+   a.innerHTML=out;
+ }
+}
+refreshMonitor();
+setInterval(refreshMonitor,5000);
+</script>
+{% endblock %}

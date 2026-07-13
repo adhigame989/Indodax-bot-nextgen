@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}History - INDODAX AI BOT{% endblock %}
+
+{% block content %}
+
+<h2>📜 Trade History</h2>
+
+<div class="grid">
+    <div class="card">
+        <h3>Total Trade</h3>
+        <p id="total-trades">0</p>
+    </div>
+
+    <div class="card">
+        <h3>Win Rate</h3>
+        <p id="winrate">0%</p>
+    </div>
+
+    <div class="card">
+        <h3>Net Profit</h3>
+        <p id="net-profit">0%</p>
+    </div>
+</div>
+
+<br>
+
+<input id="search" type="text" placeholder="Cari symbol..."
+style="width:100%;padding:10px;margin-bottom:12px;">
+
+<table>
+<thead>
+<tr>
+<th>Waktu</th>
+<th>Coin</th>
+<th>Side</th>
+<th>Reason</th>
+<th>Profit</th>
+</tr>
+</thead>
+<tbody id="history-body">
+<tr><td colspan="5">Loading...</td></tr>
+</tbody>
+</table>
+
+<script>
+
+let rows=[];
+
+function render(data){
+
+    const keyword=document.getElementById("search").value.toLowerCase();
+
+    const body=document.getElementById("history-body");
+    body.innerHTML="";
+
+    const filtered=data.filter(x=>
+        (x.symbol||"").toLowerCase().includes(keyword)
+    );
+
+    if(filtered.length===0){
+        body.innerHTML="<tr><td colspan='5'>Tidak ada data</td></tr>";
+        return;
+    }
+
+    filtered.reverse().forEach(item=>{
+
+        body.innerHTML += `
+        <tr>
+            <td>${item.timestamp ?? "-"}</td>
+            <td>${item.symbol ?? "-"}</td>
+            <td>${item.side ?? "-"}</td>
+            <td>${item.reason ?? "-"}</td>
+            <td>${item.profit_percent ?? 0}%</td>
+        </tr>`;
+
+    });
+
+}
+
+async function refreshHistory(){
+
+    const stats=await apiSafe(()=>API.stats(),{});
+    rows=await apiSafe(()=>API.history(),[]);
+
+    document.getElementById("total-trades").innerText=
+        stats.total_trades ?? rows.length;
+
+    document.getElementById("winrate").innerText=
+        (stats.winrate ?? 0)+"%";
+
+    document.getElementById("net-profit").innerText=
+        (stats.net_profit_percent ?? 0)+"%";
+
+    render(rows);
+
+}
+
+document.getElementById("search").addEventListener("input",()=>render(rows));
+
+refreshHistory();
+setInterval(refreshHistory,10000);
+
+</script>
+
+{% endblock %}

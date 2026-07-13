@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Scanner - INDODAX AI BOT{% endblock %}
+
+{% block content %}
+<h2>🔎 AI Market Scanner</h2>
+
+<div class="grid">
+  <div class="card">
+    <h3>Market Status</h3>
+    <p id="market-status">Loading...</p>
+  </div>
+
+  <div class="card">
+    <h3>BTC Trend</h3>
+    <p id="btc-trend">-</p>
+  </div>
+
+  <div class="card">
+    <h3>Total Kandidat</h3>
+    <p id="candidate-count">0</p>
+  </div>
+
+  <div class="card">
+    <h3>Last Scan</h3>
+    <p id="last-scan">-</p>
+  </div>
+</div>
+
+<br>
+
+<div id="scanner-list">
+  <div class="card">
+    <h3>Scanner sedang memuat...</h3>
+  </div>
+</div>
+
+<script>
+async function loadScanner(){
+
+    const result = await apiSafe(()=>API.scanner(), []);
+
+    const container = document.getElementById("scanner-list");
+    container.innerHTML = "";
+
+    document.getElementById("candidate-count").innerText = result.length || 0;
+    document.getElementById("market-status").innerText = "ONLINE";
+    document.getElementById("last-scan").innerText = new Date().toLocaleTimeString();
+
+    if(result.length === 0){
+        container.innerHTML = `
+        <div class="card">
+            <h3>Tidak ada kandidat</h3>
+            <p>Bot belum menemukan setup yang layak.</p>
+        </div>`;
+        return;
+    }
+
+    result.sort((a,b)=>(b.ai_score||0)-(a.ai_score||0));
+
+    result.forEach(item=>{
+
+        container.innerHTML += `
+        <div class="card">
+
+            <h3>${item.symbol}</h3>
+
+            <b>AI Score :</b> ${item.ai_score ?? "-"}<br>
+            <b>Trend :</b> ${item.trend ?? "-"}<br>
+            <b>Momentum :</b> ${item.momentum ?? "-"}<br>
+            <b>Spread :</b> ${item.spread ?? "-"} %<br>
+            <b>Volume :</b> ${item.volume ?? "-"}<br>
+            <b>EMA :</b> ${item.ema_signal ?? "-"}<br>
+            <b>RSI :</b> ${item.rsi ?? "-"}<br>
+            <b>MACD :</b> ${item.macd ?? "-"}<br>
+            <b>ATR :</b> ${item.atr ?? "-"}<br>
+
+        </div>`;
+    });
+
+}
+
+loadScanner();
+setInterval(loadScanner,30000);
+</script>
+{% endblock %}

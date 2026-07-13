@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - INDODAX AI BOT{% endblock %}
+
+{% block content %}
+
+<h2>⚙️ Bot Settings</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Bot Control</h3>
+
+<button onclick="startBot()">▶ START BOT</button>
+<br><br>
+<button onclick="stopBot()">⏹ STOP BOT</button>
+
+</div>
+
+<div class="card">
+
+<h3>Trading</h3>
+
+<label>Base Trade Amount</label><br>
+<input id="base_trade_amount" type="number" style="width:100%"><br><br>
+
+<label>Max Active Trades</label><br>
+<input id="max_active_trades" type="number" style="width:100%"><br><br>
+
+<label>Max Layer / Coin</label><br>
+<input id="max_layer_per_coin" type="number" style="width:100%"><br><br>
+
+<button onclick="saveSettings()">💾 Save</button>
+
+</div>
+
+<div class="card">
+
+<h3>Engine</h3>
+
+<button onclick="syncNow()">🔄 Sync</button>
+<br><br>
+
+<button onclick="recoverNow()">♻ Recovery</button>
+
+</div>
+
+</div>
+
+<div class="card" style="margin-top:20px">
+
+<h3>Status</h3>
+
+<p id="status">Loading...</p>
+
+</div>
+
+<script>
+
+async function loadSettings(){
+
+    const cfg = await apiSafe(()=>API.settings(),{});
+
+    document.getElementById("base_trade_amount").value =
+        cfg.base_trade_amount ?? "";
+
+    document.getElementById("max_active_trades").value =
+        cfg.max_active_trades ?? "";
+
+    document.getElementById("max_layer_per_coin").value =
+        cfg.max_layer_per_coin ?? "";
+
+}
+
+async function saveSettings(){
+
+    await API.saveSettings({
+
+        base_trade_amount:
+            Number(document.getElementById("base_trade_amount").value),
+
+        max_active_trades:
+            Number(document.getElementById("max_active_trades").value),
+
+        max_layer_per_coin:
+            Number(document.getElementById("max_layer_per_coin").value)
+
+    });
+
+    document.getElementById("status").innerText =
+        "Settings berhasil disimpan.";
+
+}
+
+async function startBot(){
+
+    await API.start();
+
+    document.getElementById("status").innerText =
+        "Bot dijalankan.";
+
+}
+
+async function stopBot(){
+
+    await API.stop();
+
+    document.getElementById("status").innerText =
+        "Bot dihentikan.";
+
+}
+
+async function syncNow(){
+
+    await API.sync();
+
+    document.getElementById("status").innerText =
+        "Sync selesai.";
+
+}
+
+async function recoverNow(){
+
+    await API.recovery();
+
+    document.getElementById("status").innerText =
+        "Recovery selesai.";
+
+}
+
+loadSettings();
+
+</script>
+
+{% endblock %}
