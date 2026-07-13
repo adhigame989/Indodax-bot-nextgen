@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}INDODAX AI BOT{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script defer src="{{ url_for('static', filename='js/api.js') }}"></script>
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🤖 INDODAX AI BOT</div>
+  <div id="bot-status">Loading...</div>
+</header>
+
+<nav class="navbar">
+  <a href="/">Home</a>
+  <a href="/scanner">Scanner</a>
+  <a href="/monitor">Monitor</a>
+  <a href="/history">History</a>
+  <a href="/settings">Settings</a>
+</nav>
+
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <small>INDODAX AI BOT • Railway Ready</small>
+</footer>
+
+<script>
+async function refreshStatus(){
+  try{
+    const r=await fetch('/api/status');
+    const d=await r.json();
+    document.getElementById('bot-status').innerText=
+      `${d.bot} | ${d.exchange}`;
+  }catch(e){
+    document.getElementById('bot-status').innerText='OFFLINE';
+  }
+}
+refreshStatus();
+setInterval(refreshStatus,5000);
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
