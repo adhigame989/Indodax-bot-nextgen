@@ -1,0 +1,25 @@
+import os
+
+APP_NAME='INDODAX AI BOT NEXTGEN'
+VERSION='2.0'
+HOST='0.0.0.0'
+PORT=int(os.getenv('PORT','5000'))
+DEBUG=False
+DATA_DIR=os.getenv('DATA_DIR','./data')
+LOG_DIR=os.path.join(DATA_DIR,'logs')
+LOG_LEVEL=os.getenv('LOG_LEVEL','INFO')
+INDODAX_API_KEY=os.getenv('INDODAX_API_KEY','')
+INDODAX_SECRET_KEY=os.getenv('INDODAX_SECRET_KEY','')
+BASE_TRADE_AMOUNT=int(os.getenv('BASE_TRADE_AMOUNT','50000'))
+MAX_ACTIVE_TRADES=int(os.getenv('MAX_ACTIVE_TRADES','3'))
+MAX_LAYER_PER_COIN=int(os.getenv('MAX_LAYER_PER_COIN','3'))
+SCAN_INTERVAL=int(os.getenv('SCAN_INTERVAL','60'))
+TRADER_INTERVAL=int(os.getenv('TRADER_INTERVAL','10'))
+TAKE_PROFIT=float(os.getenv('TAKE_PROFIT','8'))
+STOP_LOSS=float(os.getenv('STOP_LOSS','5'))
+TRAILING_GAP=float(os.getenv('TRAILING_GAP','2'))
+HISTORY_FILE=os.path.join(DATA_DIR,'history.json')
+ACTIVE_TRADES_FILE=os.path.join(DATA_DIR,'active_trades.json')
+COOLDOWN_FILE=os.path.join(DATA_DIR,'cooldown.json')
+PAPER_WALLET_FILE=os.path.join(DATA_DIR,'paper_wallet.json')
+CONFIG_FILE=os.path.join(DATA_DIR,'config.json')
