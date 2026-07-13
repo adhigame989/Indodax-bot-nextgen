@@ -1,53 +1,151 @@
-// dashboard.js V3 Full Replacement
-function el(id){return document.getElementById(id);}
-function fmtIDR(v){return "Rp"+Number(v||0).toLocaleString("id-ID");}
+// ======================================================
+// INDODAX AI BOT
+// dashboard.js V4 Full Replacement
+// No dependency on api.js
+// ======================================================
 
-async function fetchStatus(){
- const s=await apiSafe(()=>API.status(),null);
- if(!s)return;
- if(el("bot-status"))el("bot-status").innerText=s.bot??"OFFLINE";
- if(el("exchange-status"))el("exchange-status").innerText=s.exchange??"OFFLINE";
- if(el("idr-balance"))el("idr-balance").innerText=fmtIDR(s.idr_balance);
- if(el("total-asset"))el("total-asset").innerText=fmtIDR(s.total_asset);
- if(el("btc-status"))el("btc-status").innerText=s.btc_status??"-";
- if(el("top-scanner"))el("top-scanner").innerText=s.top_scanner??"-";
- if(el("recent-activity"))el("recent-activity").innerText=s.last_activity??"-";
+async function getJSON(url) {
+    try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+            cache: "no-store",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!res.ok) throw new Error(res.status);
+
+        return await res.json();
+
+    } catch (e) {
+        console.log("Fetch Error:", url, e);
+        return null;
+    }
 }
 
-async function fetchStats(){
- const s=await apiSafe(()=>API.stats(),null);
- if(!s)return;
- if(el("today-profit"))el("today-profit").innerText=(s.today_profit??0)+"%";
- if(el("win-rate"))el("win-rate").innerText=(s.winrate??0)+"%";
+function el(id) {
+    return document.getElementById(id);
 }
 
-async function fetchPositions(){
- const p=await apiSafe(()=>API.positions(),[]);
- const box=el("active-position");
- if(!box)return;
- if(!Array.isArray(p)||!p.length){
-   box.innerHTML="Belum ada posisi aktif.";
-   return;
- }
- box.innerHTML=p.map(x=>`
- <div>
- <b>${x.symbol||"-"}</b><br>
- Profit : ${x.profit_percent??0}%<br>
- Layer : ${x.layer??1}<br>
- Hold : ${x.hold_time??"-"}
- </div>
- <hr>`).join("");
+function setText(id, value) {
+    const obj = el(id);
+    if (obj) obj.innerText = value;
 }
 
-async function refreshDashboard(){
- await Promise.all([
-   fetchStatus(),
-   fetchStats(),
-   fetchPositions()
- ]);
+function formatIDR(v) {
+    if (v == null) return "0";
+
+    return "Rp " + Number(v).toLocaleString("id-ID");
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
- refreshDashboard();
- setInterval(refreshDashboard,5000);
+async function refreshDashboard() {
+
+    const status = await getJSON("/api/status");
+    const stats = await getJSON("/api/stats");
+    const positions = await getJSON("/api/positions");
+
+    // ===============================
+    // STATUS
+    // ===============================
+
+    if (status) {
+
+        setText("bot-status",
+            status.bot || "RUNNING"
+        );
+
+        setText("exchange-status",
+            status.exchange || "-"
+        );
+
+        setText("btc-status",
+            status.btc_status || "-"
+        );
+
+        setText("top-scanner",
+            status.top_scanner || "-"
+        );
+
+        if (el("idr-balance"))
+            el("idr-balance").innerText =
+                formatIDR(status.idr_balance || 0);
+
+        if (el("total-asset"))
+            el("total-asset").innerText =
+                formatIDR(status.total_asset || 0);
+
+        if (el("recent-activity"))
+            el("recent-activity").innerHTML =
+                status.last_activity || "Belum ada aktivitas.";
+    }
+
+    // ===============================
+    // STATS
+    // ===============================
+
+    if (stats) {
+
+        setText("today-profit",
+            (stats.today_profit || 0) + "%");
+
+        setText("win-rate",
+            (stats.winrate || 0) + "%");
+
+    }
+
+    // ===============================
+    // ACTIVE POSITION
+    // ===============================
+
+    if (el("active-position")) {
+
+        if (!positions || positions.length === 0) {
+
+            el("active-position").innerHTML =
+                "Belum ada posisi aktif.";
+
+        } else {
+
+            let html = "";
+
+            positions.forEach(p => {
+
+                html += `
+                <div class="card" style="margin-bottom:10px">
+
+                    <b>${p.symbol}</b><br>
+
+                    Layer : ${p.layer ?? 1}<br>
+
+                    Buy : ${p.buy_price ?? "-"}<br>
+
+                    Profit :
+                    ${p.profit_percent ?? 0}%<br>
+
+                    Hold :
+                    ${p.hold_time ?? "-"}
+
+                </div>
+                `;
+
+            });
+
+            el("active-position").innerHTML = html;
+
+        }
+
+    }
+
+}
+
+// =======================================
+// AUTO REFRESH
+// =======================================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    refreshDashboard();
+
+    setInterval(refreshDashboard, 5000);
+
 });
