@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Home - INDODAX AI BOT{% endblock %}
+
+{% block content %}
+<h2>🏠 Dashboard</h2>
+
+<div class="grid">
+  <div class="card"><h3>🤖 Bot Status</h3><p id="bot-status">Loading...</p></div>
+  <div class="card"><h3>🌐 Exchange</h3><p id="exchange-status">Loading...</p></div>
+
+  <div class="card"><h3>💰 Saldo IDR</h3><p id="idr-balance">Rp 0</p></div>
+  <div class="card"><h3>💼 Total Asset</h3><p id="total-asset">Rp 0</p></div>
+
+  <div class="card"><h3>📈 Profit Hari Ini</h3><p id="today-profit">0%</p></div>
+  <div class="card"><h3>🎯 Win Rate</h3><p id="win-rate">0%</p></div>
+
+  <div class="card"><h3>₿ BTC Status</h3><p id="btc-status">-</p></div>
+  <div class="card"><h3>🏅 Top Scanner</h3><p id="top-scanner">-</p></div>
+</div>
+
+<h3 style="margin-top:20px;">📦 Active Position</h3>
+<div class="card">
+  <div id="active-position">Belum ada posisi aktif.</div>
+</div>
+
+<h3 style="margin-top:20px;">📜 Aktivitas Terakhir</h3>
+<div class="card">
+  <div id="recent-activity">Belum ada aktivitas.</div>
+</div>
+{% endblock %}
