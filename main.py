@@ -122,7 +122,8 @@ def settings_page():
     return render_template("settings.html")
 
 if __name__ == "__main__":
-    threading.Thread(target=wallet_worker, daemon=True).start()
+    threading.Thread(target=engine_worker, daemon=True).start()
+    threading.Thread(target=wallet_worker,daemon=True).start()
     info("Dashboard aktif")
     app.run(
         host="0.0.0.0",
