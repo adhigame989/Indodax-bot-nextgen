@@ -5,6 +5,7 @@ Production Bootstrap (Refactored)
 
 from flask import Flask, render_template
 import threading
+import time
 
 import config
 from api import init_api
@@ -26,6 +27,7 @@ from storage import StorageManager
 from sync import SyncEngine
 from trader import Trader
 from validator import BuyValidator
+from wallet import init_wallet
 
 app = Flask(__name__)
 
@@ -35,6 +37,7 @@ storage.initialize()
 
 exchange = ExchangeClient()
 exchange.initialize()
+wallet = init_wallet(exchange)
 
 positions = PositionManager(storage)
 history = HistoryEngine(storage)
@@ -87,6 +90,17 @@ def engine_worker():
     trader.startup()
     scheduler.start()
 
+def wallet_worker():
+    info("Wallet startup")
+
+    while True:
+        try:
+            wallet.refresh()
+        except Exception as e:
+            error(f"Wallet : {e}")
+
+        time.sleep(20)
+
 @app.route("/")
 def home():
     return render_template("home.html")
@@ -108,7 +122,7 @@ def settings_page():
     return render_template("settings.html")
 
 if __name__ == "__main__":
-    threading.Thread(target=engine_worker, daemon=True).start()
+    threading.Thread(target=wallet_worker, daemon=True).start()
     info("Dashboard aktif")
     app.run(
         host="0.0.0.0",
