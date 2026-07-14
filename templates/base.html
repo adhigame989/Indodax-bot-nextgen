@@ -11,7 +11,7 @@
 <body>
 <header class="topbar">
   <div class="brand">🤖 INDODAX AI BOT</div>
-  <div id="bot-status">Loading...</div>
+  <div id="header-bot-status">Loading...</div>
 </header>
 
 <nav class="navbar">
@@ -35,7 +35,7 @@ async function refreshStatus(){
   try{
     const r=await fetch('/api/status');
     const d=await r.json();
-    document.getElementById('bot-status').innerText=
+    document.getElementById('header-bot-status').innerText=
       `${d.bot} | ${d.exchange}`;
   }catch(e){
     document.getElementById('bot-status').innerText='OFFLINE';
@@ -45,6 +45,7 @@ refreshStatus();
 setInterval(refreshStatus,5000);
 </script>
 
+<script defer src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
