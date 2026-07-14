@@ -1,6 +1,8 @@
 """api.py V5"""
 from flask import Blueprint,jsonify
 import config
+from wallet import get_wallet
+
 def init_api(trader):
  api=Blueprint("api",__name__)
  j=lambda d,s=200:(jsonify(d),s)
