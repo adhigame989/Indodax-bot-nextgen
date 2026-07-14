@@ -77,6 +77,18 @@ def init_api(trader):
         except Exception as e:
             return j({"status":"ERROR","message":str(e)},500)
 
+    @api.get("/dashboard")
+        def dashboard():
+            try:
+                return j({
+                    "status": status()[0].json if False else {},
+                    "stats": stats()[0].json if False else {},
+                    "positions": positions()[0].json if False else {},
+                    "scanner": scanner()[0].json if False else {}
+                })
+            except Exception as e:
+                return j({"status": "ERROR", "message": str(e)}, 500)
+
     @api.get("/history")
     def history():
         try:
