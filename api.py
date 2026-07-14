@@ -18,7 +18,7 @@ def init_api(trader):
   try:
    if hasattr(trader.scanner,"last_result"): t=(trader.scanner.last_result or {}).get("top_scanner","-")
   except: pass
-  return {"status":"OK","bot":"RUNNING" if getattr(trader,"running",True) else "STOPPED","exchange":"ONLINE","idr_balance":getattr(trader,"idr_balance",0),"total_asset":getattr(trader,"total_asset",0),"btc_status":getattr(trader,"btc_status","-"),"top_scanner":t,"last_activity":getattr(trader,"last_activity","-"),"active_trades":len(pos()),"symbols":len(pos()),"version":"5.0"}
+  return {"status":"OK","bot":"RUNNING" if getattr(trader,"running",True) else "STOPPED","exchange":"ONLINE","idr_balance": wallet.get_idr() if wallet else 0,"total_asset": wallet.get_total_asset() if wallet else 0,"wallet": wallet.get_assets() if wallet else {},"btc_status":getattr(trader,"btc_status","-"),"top_scanner":t,"last_activity":getattr(trader,"last_activity","-"),"active_trades":len(pos()),"symbols":len(pos()),"version":"5.0"}
  def sts():
   try:
    return trader.stats.summary()
