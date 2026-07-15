@@ -5,6 +5,7 @@ from wallet import get_wallet
 
 def init_api(trader):
  api=Blueprint("api",__name__)
+ wallet = get_wallet()
  j=lambda d,s=200:(jsonify(d),s)
  def pos():
   try:
@@ -18,7 +19,7 @@ def init_api(trader):
   try:
    if hasattr(trader.scanner,"last_result"): t=(trader.scanner.last_result or {}).get("top_scanner","-")
   except: pass
-  return {"status":"OK","bot":"RUNNING" if getattr(trader,"running",True) else "STOPPED","exchange":"ONLINE","idr_balance": wallet.get_idr() if wallet else 0,"total_asset": wallet.get_total_asset() if wallet else 0,"wallet": wallet.get_assets() if wallet else {},"btc_status":getattr(trader,"btc_status","-"),"top_scanner":t,"last_activity":getattr(trader,"last_activity","-"),"active_trades":len(pos()),"symbols":len(pos()),"version":"5.0"}
+  return {"status":"OK","bot":"RUNNING" if getattr(trader,"running",True) else "STOPPED","exchange":"ONLINE","idr_balance": wallet.get_idr() if wallet is not None else 0,"total_asset": wallet.get_total_asset() if wallet is not None else 0,"wallet": wallet.get_assets() if wallet is not None else {},"btc_status":getattr(trader,"btc_status","-"),"top_scanner":t,"last_activity":getattr(trader,"last_activity","-"),"active_trades":len(pos()),"symbols":len(pos()),"version":"5.0"}
  def sts():
   try:
    return trader.stats.summary()
