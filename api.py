@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify
 
 api = Blueprint("api", __name__)
 
-def register_api(app, trader, positions, scanner=None):
+def init_api(app, trader, positions, scanner=None):
     app.register_blueprint(api)
 
     @api.get("/api/status")
@@ -47,4 +47,4 @@ def register_api(app, trader, positions, scanner=None):
         trader.stop()
         return jsonify({"success": True, "running": False})
 
-    return api
+    return app
