@@ -22,7 +22,7 @@ class WalletService:
 
     def refresh(self):
         try:
-            info = self.exchange.fetch_balance()
+            info = self.exchange.safe_balance()
 
             with self.lock:
                 CACHE["last_update"] = time.time()
