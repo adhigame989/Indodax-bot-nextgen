@@ -22,38 +22,34 @@ class WalletService:
 
     def refresh(self):
         try:
-            info = self.exchange.safe_balance()
-            print("===== WALLET DEBUG =====")
-            print(info)
-            print("========================")
+            info = self.exchange.safe_balance() or {}
+
+            raw = info.get("info", {}).get("return", {})
+            balance = raw.get("balance", {})
 
             with self.lock:
                 CACHE["last_update"] = time.time()
                 CACHE["online"] = True
 
-                CACHE["idr_balance"] = float(
-                    info.get("IDR", {}).get("free", 0)
-                )
+                CACHE["idr_balance"] = float(balance.get("idr", 0))
 
                 CACHE["coins"] = {}
 
                 total = CACHE["idr_balance"]
 
-                for coin, data in info.items():
-
-                    if not isinstance(data, dict):
+                for coin, amount in balance.items():
+                    try:
+                        amount = float(amount)
+                    except Exception:
                         continue
 
-                    free = float(data.get("free", 0))
-
-                    if free <= 0:
+                    if amount <= 0:
                         continue
 
-                    CACHE["coins"][coin] = free
+                    CACHE["coins"][coin.upper()] = amount
 
                 CACHE["total_asset"] = total
-
-        except Exception as e:
+                    except Exception as e:
             print("[Wallet]", e)
 
             with self.lock:
