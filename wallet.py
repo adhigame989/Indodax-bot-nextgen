@@ -23,6 +23,9 @@ class WalletService:
     def refresh(self):
         try:
             info = self.exchange.safe_balance()
+            print("===== WALLET DEBUG =====")
+            print(info)
+            print("========================")
 
             with self.lock:
                 CACHE["last_update"] = time.time()
