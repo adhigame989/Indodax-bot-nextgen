@@ -49,11 +49,11 @@ class WalletService:
                     CACHE["coins"][coin.upper()] = amount
 
                 CACHE["total_asset"] = total
-                    except Exception as e:
-                        print("[Wallet]", e)
+        except Exception as e:
+            print("[Wallet]", e)
 
-                        with self.lock:
-                            CACHE["online"] = False
+            with self.lock:
+                CACHE["online"] = False
 
     def get_idr(self):
         return CACHE["idr_balance"]
